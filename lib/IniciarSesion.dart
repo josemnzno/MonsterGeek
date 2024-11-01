@@ -1,7 +1,17 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:monstergeek/AdminMenu.dart';
+import 'package:monstergeek/IniciarSesion.dart';
 
-class IniciarSesion extends StatelessWidget {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -9,67 +19,45 @@ class IniciarSesion extends StatelessWidget {
       theme: ThemeData(
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      home: LoginPage(),
+      home: LoginPage(), // Página de inicio
     );
   }
-}
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Row(
-        children: [
-          Image.asset('lib/assets/logo.png', height: 40),
-          SizedBox(width: 10),
-          Text('Monster Geek', style: TextStyle(color: Colors.white)),
-        ],
-      ),
-      actions: _buildNavLinks(),
-      backgroundColor: Colors.black,
-    ),
-    body: SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildHeroSection(),
+}class LoginPage extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-        ],
-      ),
-    ),
-  );
-}
-Widget _buildHeroSection() {
-  return Container(
-    padding: EdgeInsets.symmetric(vertical: 40),
-    color: Colors.black,
-    child: Center(
-      child: Image.asset('lib/assets/banner.png', fit: BoxFit.cover),
-    ),
-  );
-}
+  Future<void> _signIn(BuildContext context) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
 
-List<Widget> _buildNavLinks() {
-  return [
-    _navLink('Inicio'),
-    _navLink('Autos a Escala'),
-    _navLink('Figuras'),
-    _navLink('Cómics'),
-    _navLink('Cafetería'),
-    GestureDetector(
-      onTap: () {
-      },
-      child: Image.asset('lib/assets/icono.png', height: 30),
-    ),
-  ];
-}
+      // Login exitoso
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Inicio de sesión exitoso')));
 
+      // Redirigir a AdminMenu
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AdminMenu()), // Asegúrate de que el nombre sea AdminMenu
+      );
+    } on FirebaseAuthException catch (e) {
+      // Manejo de errores
+      String message;
+      if (e.code == 'user-not-found') {
+        message = 'No se encontró un usuario con ese correo.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Contraseña incorrecta.';
+      } else {
+        message = 'Error: ${e.message}';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)));
+    }
+  }
 
-Widget _navLink(String text) {
-  return TextButton(
-    onPressed: () {},
-    child: Text(text, style: TextStyle(color: Colors.white)),
-  );
-}
-class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,25 +71,24 @@ class LoginPage extends StatelessWidget {
         ),
         backgroundColor: Colors.black,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildLoginForm(),
-            _buildFooter(),
-          ],
-        ),
+      body: Column(
+        children: [
+          _buildLoginForm(context),
+          Spacer(), // Esto empuja el footer hacia abajo
+          _buildFooter(),
+        ],
       ),
     );
   }
 
-
-
-  Widget _buildLoginForm() {
+  Widget _buildLoginForm(BuildContext context) {
     return Container(
+      width: MediaQuery.of(context).size.width * 0.3, // 65% del ancho
+      height: 350, // Ajusta la altura según sea necesario
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.lightBlueAccent,
+        color: Colors.lightBlueAccent, // Color de fondo azul
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -117,6 +104,7 @@ class LoginPage extends StatelessWidget {
           Text('Correo:', style: TextStyle(fontSize: 18)),
           SizedBox(height: 5),
           TextField(
+            controller: emailController,
             decoration: InputDecoration(
               hintText: 'monstergeekoficial@gmail.com',
               border: OutlineInputBorder(),
@@ -126,6 +114,7 @@ class LoginPage extends StatelessWidget {
           Text('Contraseña:', style: TextStyle(fontSize: 18)),
           SizedBox(height: 5),
           TextField(
+            controller: passwordController,
             obscureText: true,
             decoration: InputDecoration(
               hintText: '****************',
@@ -134,48 +123,16 @@ class LoginPage extends StatelessWidget {
           ),
           SizedBox(height: 20),
           Center(
-            child: Column(
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Lógica de inicio de sesión
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.yellowAccent,
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  ),
-                  child: Text(
-                    'Acceder',
-                    style: TextStyle(color: Colors.black, fontSize: 18),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // Lógica para recuperar la contraseña
-                  },
-                  child: Text(
-                    '¿Olvidaste tu contraseña?',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ),
-                Text(
-                  'o',
-                  style: TextStyle(fontSize: 18, color: Colors.black),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Lógica para registrarse
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.yellowAccent,
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  ),
-                  child: Text(
-                    'Registrarse',
-                    style: TextStyle(color: Colors.black, fontSize: 18),
-                  ),
-                ),
-              ],
+            child: ElevatedButton(
+              onPressed: () => _signIn(context), // Cambiado para llamar a _signIn
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.yellowAccent,
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+              ),
+              child: Text(
+                'Acceder',
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              ),
             ),
           ),
         ],
@@ -200,14 +157,6 @@ class LoginPage extends StatelessWidget {
               _footerLink('Política de cookies'),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Image.asset('lib/assets/hotwheels.png', height: 100),
-              Image.asset('lib/assets/lego.png', height: 50),
-              Image.asset('lib/assets/funko.png', height: 50),
-            ],
-          ),
         ],
       ),
     );
@@ -215,7 +164,9 @@ class LoginPage extends StatelessWidget {
 
   Widget _footerLink(String text) {
     return TextButton(
-      onPressed: () {},
+      onPressed: () {
+        // Implementar la lógica para cada enlace aquí
+      },
       child: Text(text, style: TextStyle(color: Colors.white)),
     );
   }

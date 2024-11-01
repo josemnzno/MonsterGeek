@@ -1,11 +1,21 @@
 import 'dart:html'; // Necesario para el iframe
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'dart:ui_web';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:monstergeek/AdminMenu.dart';
 import 'package:monstergeek/IniciarSesion.dart';
+import 'firebase_options.dart';
 
-void main() {
+import 'package:google_fonts/google_fonts.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -26,30 +36,41 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isServicesHovered = false;
+  bool isServicesHovered = false; // Para controlar el hover del menú de servicios
+
+  @override
+  void initState() {
+    super.initState();
+    // Registrar el iframe para Google Maps
+    platformViewRegistry.registerViewFactory(
+      'google-maps',
+          (int viewId) => IFrameElement()
+        ..src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3791.3617054670085!2d-94.42482262615084!3d18.14724418047402!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85e98399b675949d%3A0xc7d56bed76c74cf!2sMonstergeek!5e0!3m2!1ses-419!2smx!4v1729704890114!5m2!1ses-419!2smx"
+        ..style.border = 'none'
+        ..style.height = '350px'
+        ..style.width = '100%',
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
             Image.asset('lib/assets/logo.png', height: 40),
             SizedBox(width: 10),
-            Text('Monster Geek', style: TextStyle(color: Colors.white)),
+            Text('Monster Geek Lite', style: TextStyle(color: Colors.white)),
           ],
         ),
-        actions: isMobile ? null : _buildNavLinks(),
+        actions: _buildNavLinks(),
         backgroundColor: Colors.black,
       ),
-      drawer: isMobile ? Drawer(child: ListView(children: _buildNavLinks())) : null,
       body: SingleChildScrollView(
         child: Column(
           children: [
             _buildHeroSection(),
-            _buildMapAndAddressSection(isMobile),
+            _buildMapAndAddressSection(),
             _buildCategoriesSection(),
             _buildServicesSection(),
             _buildFooter(),
@@ -66,15 +87,15 @@ class _HomePageState extends State<HomePage> {
       _navLink('Figuras'),
       _navLink('Cómics'),
       _navLink('Cafetería'),
-      _buildServicesDropdown(),
-      GestureDetector(
+      _buildServicesDropdown(),GestureDetector(
         onTap: () {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => IniciarSesion()),
+            MaterialPageRoute(builder: (context) => LoginPage() ),
           );
         },
         child: Image.asset('lib/assets/icono.png', height: 30),
+
       ),
     ];
   }
@@ -87,19 +108,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildServicesDropdown() {
-    return PopupMenuButton<String>(
-      onSelected: (value) {
-        print("Selected: $value");
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(value: 'Cafetería', child: Text('Cafetería')),
-        PopupMenuItem(value: 'Sublimación', child: Text('Sublimación')),
-        PopupMenuItem(value: 'Impresión 3D', child: Text('Impresión 3D')),
-        PopupMenuItem(value: 'Ensamblaje PC', child: Text('Ensamblaje de PC')),
-      ],
-      child: TextButton(
-        onPressed: () {},
-        child: Text('Servicios', style: TextStyle(color: Colors.white)),
+    return MouseRegion(
+      onEnter: (_) => setState(() => isServicesHovered = true),
+      onExit: (_) => setState(() => isServicesHovered = false),
+      child: PopupMenuButton<String>(
+        onSelected: (value) {
+          // Lógica para navegar a la sección correspondiente
+          print("Selected: $value");
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem(value: 'Cafetería', child: Text('Cafetería')),
+          PopupMenuItem(value: 'Sublimación', child: Text('Sublimación')),
+          PopupMenuItem(value: 'Impresión 3D', child: Text('Impresión 3D')),
+          PopupMenuItem(value: 'Ensamblaje PC', child: Text('Ensamblaje de PC')),
+        ],
+        child: TextButton(
+          onPressed: () {}, // Puedes dejar esto vacío si usas hover
+          child: Text('Servicios', style: TextStyle(color: Colors.white)),
+        ),
       ),
     );
   }
@@ -114,14 +140,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildMapAndAddressSection(bool isMobile) {
+  Widget _buildMapAndAddressSection() {
     return Column(
       children: [
         Container(
           color: Color(0xFFFCE14D),
           padding: EdgeInsets.all(8),
           child: Text(
-            '¿Dónde nos encuentras?',
+            '¿Dónde nos encuentras?                                                                                                                                                                                            ',
             style: TextStyle(
               fontSize: 30,
               color: Colors.black,
@@ -130,49 +156,45 @@ class _HomePageState extends State<HomePage> {
             textAlign: TextAlign.center,
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 20),
-          child: isMobile
-              ? Column(
-            children: [
-              _buildMap(),
-              _buildAddress(),
-            ],
-          )
-              : Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildMap(),
-              _buildAddress(),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMap() {
-    return Container(
-      width: 500,
-      height: 350,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: HtmlElementView(viewType: 'google-maps'),
-      ),
-    );
-  }
-
-  Widget _buildAddress() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Dirección: Guerrero #505,', style: TextStyle(fontSize: 24)),
-        Text('Coatzacoalcos, Ver, México', style: TextStyle(fontSize: 24)),
-        Text('Lunes-Sábado: 11am - 6pm', style: TextStyle(fontSize: 24)),
-        Text('Domingo: 11am - 5pm', style: TextStyle(fontSize: 24)),
-        TextButton(
-          onPressed: () {},
-          child: Text('Monster Geek en Facebook', style: TextStyle(color: Colors.blue)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 20),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: SizedBox(
+                  width: 500,
+                  height: 350,
+                  child: HtmlElementView(viewType: 'google-maps'),
+                ),
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Dirección: Guerrero #505,', style: TextStyle(fontSize: 24)),
+                        Text('Coatzacoalcos, Ver, México', style: TextStyle(fontSize: 24)),
+                        Text('Lunes-Sábado: 11am - 6pm', style: TextStyle(fontSize: 24)),
+                        Text('Domingo: 11am - 5pm', style: TextStyle(fontSize: 24)),
+                        TextButton(
+                          onPressed: () {},
+                          child: Text('Monster Geek en Facebook', style: TextStyle(color: Colors.blue)),
+                        ),
+                      ],
+                    ),
+                    SizedBox(width: 20),
+                    Image.asset('lib/assets/grenlim.png', height: 300), // Imagen al lado derecho
+                  ],
+                ),
+              ],
+            ),
+          ],
         ),
       ],
     );
@@ -180,7 +202,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildCategoriesSection() {
     return _buildSection(
-      title: 'Categorías',
+      title: '                                                                                                                    Categorías                                                                                                                                                                       ',
       children: [
         _buildCategoryItem('lib/assets/autos.jfif', 'Autos a Escala'),
         _buildCategoryItem('lib/assets/comics.jfif', 'Cómics'),
@@ -192,15 +214,17 @@ class _HomePageState extends State<HomePage> {
   Widget _buildCategoryItem(String imagePath, String title) {
     return Column(
       children: [
-        Image.asset(imagePath, height: 150, width: 150), // Ajuste de tamaño para móviles
+        SizedBox(height: 30),
+        Image.asset(imagePath, height: 250, width: 250),
         Text(title, style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
+        SizedBox(height: 50),
       ],
     );
   }
 
   Widget _buildServicesSection() {
     return _buildSection(
-      title: 'Servicios',
+      title: '                                                                                                                        Servicios                                                                                                                                                                                                      ',
       children: [
         _buildServiceItem('lib/assets/cafeteria.png', 'Cafetería'),
         _buildServiceItem('lib/assets/sublimacion.png', 'Sublimación'),
@@ -213,8 +237,10 @@ class _HomePageState extends State<HomePage> {
   Widget _buildServiceItem(String imagePath, String title) {
     return Column(
       children: [
-        Image.asset(imagePath, height: 150, width: 150), // Ajuste de tamaño para móviles
+        SizedBox(height: 30),
+        Image.asset(imagePath, height: 200, width: 200),
         Text(title, style: TextStyle(fontSize: 20)),
+        SizedBox(height: 30),
       ],
     );
   }
@@ -227,10 +253,8 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.all(10),
           child: Text(title, style: TextStyle(fontSize: 24)),
         ),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          alignment: WrapAlignment.center,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: children,
         ),
       ],
@@ -252,9 +276,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildFooterLinks() {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 10,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _footerLink('Términos de uso'),
         _footerLink('Política de privacidad'),
@@ -273,12 +296,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildLegalImages() {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 10,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Image.asset('lib/assets/hotwheels.png', height: 50),
-        Image.asset('lib/assets/lego.png', height: 30),
+        Image.asset('lib/assets/hotwheels.png', height: 100),
+        Image.asset('lib/assets/lego.png', height: 50),
+        Image.asset('lib/assets/funko.png', height: 50),
       ],
     );
   }
