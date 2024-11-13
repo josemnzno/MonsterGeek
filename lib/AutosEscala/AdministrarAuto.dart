@@ -1,14 +1,19 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monstergeek/AutosEscala/EditarAuto.dart';
+import 'package:monstergeek/AutosEscala/EliminarAuto.dart';
+
+import 'AgregarAuto.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(AdministrarAuto());
 }
 
-class MyApp extends StatelessWidget {
+
+class Administrarauto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,37 +38,35 @@ class AdministrarAuto extends StatelessWidget {
             Text('Monster Geek', style: TextStyle(color: Colors.white)),
           ],
         ),
-        actions: _buildNavLinks(),
         backgroundColor: Colors.black,
+        iconTheme: IconThemeData(
+          color: Colors.white,  // Cambiar el color del icono (flecha de retroceso) a blanco
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(height: 30),
-            _buildInventoryOptions(),
-            SizedBox(height: 50),// Cuadro con opciones en el centro
-            _buildFooterBanner(), // Banner al final de la página
+            _buildInventoryOptions(context),
+            SizedBox(height: 50),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInventoryOptions() {
+
+  Widget _buildInventoryOptions(BuildContext context) {
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Imagen a la izquierda
           Image.asset('lib/assets/supercars.png', height: 150),
-
-          SizedBox(width: 20), // Espacio entre la imagen y el cuadro
-
-          // Cuadro azul con las opciones
+          SizedBox(width: 20),
           Container(
-            width: 300, // Ajusta el ancho del cuadro
-            height: 400, // Ajusta la altura del cuadro
-            padding: EdgeInsets.all(20),
+            width: 300,
+            height: 350,
+            padding: EdgeInsets.all(30),
             decoration: BoxDecoration(
               color: Colors.lightBlueAccent,
               borderRadius: BorderRadius.circular(10),
@@ -78,54 +81,92 @@ class AdministrarAuto extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 50),
-                _buildOptionButton('Agregar'),
-                SizedBox(height: 50),
-                _buildOptionButton('Eliminar'),
-                SizedBox(height: 50),
-                _buildOptionButton('Editar'),
-
+                SizedBox(height: 30),
+                _buildOptionButton(context, 'Agregar'),
+                SizedBox(height: 30),
+                _buildOptionButton2(context, 'Eliminar'),
+                SizedBox(height: 30),
+                _buildOptionButton3(context, 'Editar'),
               ],
             ),
           ),
           Image.asset('lib/assets/llantas.png', height: 180),
-
-
         ],
       ),
     );
   }
 
-  Widget _buildOptionButton(String text) {
+  Widget _buildOptionButton(BuildContext context, String text) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.black, backgroundColor: Colors.yellow,
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.yellow,
         padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
       ),
       onPressed: () {
-        // Implementar la acción para cada botón aquí
+        if (text == 'Agregar') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AgregarAuto()),
+          );
+        }
       },
       child: Text(
         text,
         style: TextStyle(fontSize: 16),
       ),
     );
+
   }
 
-  Widget _buildFooterBanner() {
-    return Container(
-      color: Colors.black,
-      padding: EdgeInsets.all(20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Image.asset('lib/assets/hotwheels.png', height: 100),
-          Image.asset('lib/assets/lego.png', height: 50),
-          Image.asset('lib/assets/funko.png', height: 50),
-        ],
+  Widget _buildOptionButton2(BuildContext context, String text) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.yellow,
+        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+      ),
+      onPressed: () {
+        if (text == 'Eliminar') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EliminarAuto()),
+          );
+        }
+      },
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 16),
       ),
     );
+
   }
+
+  Widget _buildOptionButton3(BuildContext context, String text) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.yellow,
+        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+      ),
+      onPressed: () {
+        if (text == 'Editar') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EditarAuto()),
+          );
+        }
+      },
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 16),
+      ),
+    );
+
+  }
+
+
+
 
   List<Widget> _buildNavLinks() {
     return [
@@ -152,4 +193,7 @@ class AdministrarAuto extends StatelessWidget {
       child: Text(text, style: TextStyle(color: Colors.white)),
     );
   }
+
 }
+
+

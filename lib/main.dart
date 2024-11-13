@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'dart:ui_web';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:monstergeek/AdminMenu.dart';
+import 'package:monstergeek/AutosEscala/AdministrarAuto.dart';
+import 'package:monstergeek/AutosEscala/AgregarAuto.dart';
 import 'package:monstergeek/IniciarSesion.dart';
 import 'firebase_options.dart';
-
 import 'package:google_fonts/google_fonts.dart';
 
 Future<void> main() async {
@@ -13,11 +14,10 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(Princial());
 }
 
-
-class MyApp extends StatelessWidget {
+class Princial extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Image.asset('lib/assets/logo.png', height: 40),
             SizedBox(width: 10),
-            Text('Monster Geek Lite', style: TextStyle(color: Colors.white)),
+            Text('Monster Geek', style: TextStyle(color: Colors.white)),
           ],
         ),
         actions: _buildNavLinks(),
@@ -87,15 +87,15 @@ class _HomePageState extends State<HomePage> {
       _navLink('Figuras'),
       _navLink('Cómics'),
       _navLink('Cafetería'),
-      _buildServicesDropdown(),GestureDetector(
+      _buildServicesDropdown(),
+      GestureDetector(
         onTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => LoginPage() ),
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         },
         child: Image.asset('lib/assets/icono.png', height: 30),
-
       ),
     ];
   }
@@ -145,11 +145,11 @@ class _HomePageState extends State<HomePage> {
       children: [
         Container(
           color: Color(0xFFFCE14D),
-          padding: EdgeInsets.all(8),
+          padding: EdgeInsets.symmetric(horizontal: 20), // Ajuste aquí
           child: Text(
-            '¿Dónde nos encuentras?                                                                                                                                                                                            ',
+            '¿Dónde nos encuentras?                                                                                                                                                                                                                                                                                                                                  ',
             style: TextStyle(
-              fontSize: 30,
+              fontSize: 26,
               color: Colors.black,
               fontWeight: FontWeight.bold,
             ),
@@ -201,12 +201,29 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildCategoriesSection() {
-    return _buildSection(
-      title: '                                                                                                                    Categorías                                                                                                                                                                       ',
+    return Column(
       children: [
-        _buildCategoryItem('lib/assets/autos.jfif', 'Autos a Escala'),
-        _buildCategoryItem('lib/assets/comics.jfif', 'Cómics'),
-        _buildCategoryItem('lib/assets/funkos.jfif', 'Figuras'),
+        Container(
+          color: Color(0xFFFCE14D),
+          padding: EdgeInsets.symmetric(horizontal: 20), // Ajuste aquí
+          child: Text(
+            'Categorías                                                                                                                                                                                                                                                                                                                                                 ',
+            style: TextStyle(
+              fontSize: 26,
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildCategoryItem('lib/assets/autos.jfif', 'Autos a Escala'),
+            _buildCategoryItem('lib/assets/comics.jfif', 'Cómics'),
+            _buildCategoryItem('lib/assets/funkos.jfif', 'Figuras'),
+          ],
+        ),
       ],
     );
   }
@@ -223,13 +240,30 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildServicesSection() {
-    return _buildSection(
-      title: '                                                                                                                        Servicios                                                                                                                                                                                                      ',
+    return Column(
       children: [
-        _buildServiceItem('lib/assets/cafeteria.png', 'Cafetería'),
-        _buildServiceItem('lib/assets/sublimacion.png', 'Sublimación'),
-        _buildServiceItem('lib/assets/impresion.png', 'Impresión 3D'),
-        _buildServiceItem('lib/assets/ensamble.png', 'Ensamblajes de PC'),
+        Container(
+          color: Color(0xFFFCE14D),
+          padding: EdgeInsets.symmetric(horizontal: 20), // Ajuste aquí
+          child: Text(
+            'Servicios                                                                                                                                                                                                                                                                                                                                                      ',
+            style: TextStyle(
+              fontSize: 26,
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildServiceItem('lib/assets/cafeteria.png', 'Cafetería'),
+            _buildServiceItem('lib/assets/sublimacion.png', 'Sublimación'),
+            _buildServiceItem('lib/assets/impresion.png', 'Impresión 3D'),
+            _buildServiceItem('lib/assets/ensamble.png', 'Ensamblajes de PC'),
+          ],
+        ),
       ],
     );
   }
@@ -238,29 +272,12 @@ class _HomePageState extends State<HomePage> {
     return Column(
       children: [
         SizedBox(height: 30),
-        Image.asset(imagePath, height: 200, width: 200),
-        Text(title, style: TextStyle(fontSize: 20)),
-        SizedBox(height: 30),
+        Image.asset(imagePath, height: 250, width: 250),
+        Text(title, style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
+        SizedBox(height: 50),
       ],
     );
   }
-
-  Widget _buildSection({required String title, required List<Widget> children}) {
-    return Column(
-      children: [
-        Container(
-          color: Color(0xFFFCE14D),
-          padding: EdgeInsets.all(10),
-          child: Text(title, style: TextStyle(fontSize: 24)),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: children,
-        ),
-      ],
-    );
-  }
-
   Widget _buildFooter() {
     return Container(
       color: Colors.black,
@@ -270,6 +287,8 @@ class _HomePageState extends State<HomePage> {
           Text('LEGALES', style: TextStyle(color: Colors.white)),
           _buildFooterLinks(),
           _buildLegalImages(),
+          SizedBox(height: 10),
+          Text('© 2024 Monster Geek. Todos los derechos reservados.', style: TextStyle(color: Colors.white)),
         ],
       ),
     );

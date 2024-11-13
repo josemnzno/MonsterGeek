@@ -39,6 +39,17 @@ dependencies:
   google_fonts:
   webview_flutter:
   firebase_auth:
+  image_picker:
+  cloud_firestore:
+  firebase_storage:
+  image_picker_for_web:
+  cached_network_image:
+  flutter_image_compress:
+  path_provider:
+  file_picker:
+
+
+
 
 dev_dependencies:
   flutter_test:
@@ -50,6 +61,15 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  webview_flutter:
+  image_picker_for_web:
+  cached_network_image:
+  http: ^0.13.5
+  flutter_image_compress:
+  path_provider:
+  file_picker:
+
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -83,6 +103,10 @@ flutter:
     - lib/assets/sublimacion.png
     - lib/assets/llantas.png
     - lib/assets/supercars.png
+    - lib/assets/SubirImagen.png
+    - lib/assets/groot.png
+    - lib/assets/Vengadores.png
+    - lib/assets/joker.png
 
 
 

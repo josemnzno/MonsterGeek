@@ -1,15 +1,20 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:monstergeek/AdministrarAuto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:monstergeek/Comics/AdministrarComics.dart';
+import 'package:monstergeek/Figuras/AdministrarFiguras.dart';
+
+import 'package:monstergeek/main.dart';
+import 'AutosEscala/AdministrarAuto.dart'; // Página de administración de Autos a escala
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(Adminmenu());
 }
 
-class MyApp extends StatelessWidget {
+class Adminmenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,6 +28,17 @@ class MyApp extends StatelessWidget {
 }
 
 class AdminMenu extends StatelessWidget {
+  Future<void> _signOut(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Princial()), // Vuelve a la página de inicio
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Sesión cerrada exitosamente')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,15 +50,14 @@ class AdminMenu extends StatelessWidget {
             Text('Monster Geek', style: TextStyle(color: Colors.white)),
           ],
         ),
-        actions: _buildNavLinks(),
+        actions: _buildNavLinks(context),
         backgroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             _buildHeroSection(),
-            _buildAdminMenu(context), // Pasamos `context` aquí
-            _buildFooterBanner(),
+            _buildAdminMenu(context),
           ],
         ),
       ),
@@ -59,7 +74,7 @@ class AdminMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildAdminMenu(BuildContext context) { // Se acepta `context` como argumento
+  Widget _buildAdminMenu(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -140,6 +155,20 @@ class AdminMenu extends StatelessWidget {
                       builder: (context) => AdministrarAuto(),
                     ),
                   );
+                } else if (item == 'Figuras') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdministrarFigura(),
+                    ),
+                  );
+                }else if (item == 'Comics') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdministrarComics(),
+                    ),
+                  );
                 }
               },
               child: Container(
@@ -159,22 +188,7 @@ class AdminMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildFooterBanner() {
-    return Container(
-      color: Colors.black,
-      padding: EdgeInsets.all(20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Image.asset('lib/assets/hotwheels.png', height: 100),
-          Image.asset('lib/assets/lego.png', height: 50),
-          Image.asset('lib/assets/funko.png', height: 50),
-        ],
-      ),
-    );
-  }
-
-  List<Widget> _buildNavLinks() {
+  List<Widget> _buildNavLinks(BuildContext context) {
     return [
       _navLink('Inicio'),
       _navLink('Autos a Escala'),
@@ -182,11 +196,21 @@ class AdminMenu extends StatelessWidget {
       _navLink('Cómics'),
       _navLink('Cafetería'),
       _navLink('Servicios'),
-      GestureDetector(
-        onTap: () {
-          // Implementar la lógica del icono aquí
+      PopupMenuButton<String>(
+        icon: Image.asset('lib/assets/icono.png', height: 30),
+        onSelected: (value) {
+          if (value == 'Cerrar sesión') {
+            _signOut(context);
+          }
         },
-        child: Image.asset('lib/assets/icono.png', height: 30),
+        itemBuilder: (BuildContext context) {
+          return [
+            PopupMenuItem(
+              value: 'Cerrar sesión',
+              child: Text('Cerrar sesión'),
+            ),
+          ];
+        },
       ),
     ];
   }
@@ -195,6 +219,15 @@ class AdminMenu extends StatelessWidget {
     return TextButton(
       onPressed: () {
         // Implementar la lógica de navegación aquí
+      },
+      child: Text(text, style: TextStyle(color: Colors.white)),
+    );
+  }
+
+  Widget _footerLink(String text) {
+    return TextButton(
+      onPressed: () {
+        // Implementar la lógica para cada enlace aquí
       },
       child: Text(text, style: TextStyle(color: Colors.white)),
     );

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:monstergeek/AdminMenu.dart';
 import 'package:monstergeek/IniciarSesion.dart';
+import 'package:monstergeek/main.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,12 +20,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      home: LoginPage(), // Página de inicio
+      home: Princial(), // Página de inicio
     );
   }
-}class LoginPage extends StatelessWidget {
+}
+
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _isPasswordVisible = false; // Variable para controlar la visibilidad de la contraseña
 
   Future<void> _signIn(BuildContext context) async {
     try {
@@ -34,17 +43,14 @@ class MyApp extends StatelessWidget {
         password: passwordController.text.trim(),
       );
 
-      // Login exitoso
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Inicio de sesión exitoso')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Inicio de sesión exitoso')));
 
-      // Redirigir a AdminMenu
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => AdminMenu()), // Asegúrate de que el nombre sea AdminMenu
+        MaterialPageRoute(builder: (context) => AdminMenu()),
       );
     } on FirebaseAuthException catch (e) {
-      // Manejo de errores
       String message;
       if (e.code == 'user-not-found') {
         message = 'No se encontró un usuario con ese correo.';
@@ -53,8 +59,8 @@ class MyApp extends StatelessWidget {
       } else {
         message = 'Error: ${e.message}';
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -62,19 +68,27 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Image.asset('lib/assets/logo.png', height: 40),
-            SizedBox(width: 10),
-            Text('Monster Geek', style: TextStyle(color: Colors.white)),
-          ],
+        title: GestureDetector(
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MyApp()),
+            );
+          },
+          child: Row(
+            children: [
+              Image.asset('lib/assets/logo.png', height: 40),
+              SizedBox(width: 10),
+              Text('Monster Geek', style: TextStyle(color: Colors.white)),
+            ],
+          ),
         ),
         backgroundColor: Colors.black,
       ),
       body: Column(
         children: [
           _buildLoginForm(context),
-          Spacer(), // Esto empuja el footer hacia abajo
+          Spacer(),
           _buildFooter(),
         ],
       ),
@@ -83,12 +97,12 @@ class MyApp extends StatelessWidget {
 
   Widget _buildLoginForm(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.3, // 65% del ancho
-      height: 350, // Ajusta la altura según sea necesario
+      width: MediaQuery.of(context).size.width * 0.3,
+      height: 400,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.lightBlueAccent, // Color de fondo azul
+        color: Colors.lightBlueAccent,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -115,16 +129,28 @@ class MyApp extends StatelessWidget {
           SizedBox(height: 5),
           TextField(
             controller: passwordController,
-            obscureText: true,
+            obscureText: !_isPasswordVisible, // Cambia la visibilidad según el estado
             decoration: InputDecoration(
               hintText: '****************',
               border: OutlineInputBorder(),
             ),
           ),
-          SizedBox(height: 20),
+          Row(
+            children: [
+              Checkbox(
+                value: _isPasswordVisible,
+                onChanged: (value) {
+                  setState(() {
+                    _isPasswordVisible = value!;
+                  });
+                },
+              ),
+              Text('Mostrar contraseña'),
+            ],
+          ),
           Center(
             child: ElevatedButton(
-              onPressed: () => _signIn(context), // Cambiado para llamar a _signIn
+              onPressed: () => _signIn(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.yellowAccent,
                 padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
