@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:html' as html; // Importa dart:html para la web
 import 'dart:async'; // Importa para usar Completer
+import 'package:flutter/foundation.dart'; // Importa kIsWeb para detectar plataforma web
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,16 +28,19 @@ class Agregarfigura extends StatelessWidget {
 
 class AgregarFigura extends StatefulWidget {
   @override
-  _AgregarAutoState createState() => _AgregarAutoState();
-}class _AgregarAutoState extends State<AgregarFigura> {
+  _AgregarFiguraState createState() => _AgregarFiguraState();
+}
+
+class _AgregarFiguraState extends State<AgregarFigura> {
   html.File? _selectedImage; // Variable para almacenar la imagen seleccionada
+  String? _imageUrl; // URL de la imagen para la web
 
   // Controladores de texto
   final TextEditingController _marcaController = TextEditingController();
   final TextEditingController _serieController = TextEditingController();
   final TextEditingController _piezasController = TextEditingController(text: '1');
   final TextEditingController _modeloController = TextEditingController();
-  final TextEditingController _descripcionController = TextEditingController(text: 'Figura');
+  final TextEditingController _descripcionController = TextEditingController(text: 'figura');
   final TextEditingController _precioController = TextEditingController();
 
   // Variable para manejar la selección de la marca
@@ -168,7 +172,7 @@ class AgregarFigura extends StatefulWidget {
             padding: EdgeInsets.all(10),
             child: Container(
               color: Colors.lightBlueAccent,
-              padding: EdgeInsets.all(100),
+              padding: EdgeInsets.all(20),
               width: 1000,  // Aquí ajustas el ancho del cuadro
               height: 800, // Aquí ajustas la altura del cuadro
               child: Row(
@@ -180,7 +184,7 @@ class AgregarFigura extends StatefulWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Agregar Figura',
+                          'Agregar Figuras',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -213,7 +217,7 @@ class AgregarFigura extends StatefulWidget {
                         if (_marcaSeleccionada == 'Otro')
                           _buildTextField('Escribe la marca', _marcaController),
                         SizedBox(height: 10),
-                        _buildTextField('Serie pieza', _serieController),
+                        _buildTextField('Serie', _serieController),
                         SizedBox(height: 10),
                         _buildTextField('Precio', _precioController),
                         SizedBox(height: 10),
@@ -222,7 +226,7 @@ class AgregarFigura extends StatefulWidget {
                         _buildTextField('Tipo', _descripcionController),
                         SizedBox(height: 10),
                         _buildTextField('Piezas disponibles', _piezasController),
-                        SizedBox(height: 10),
+                        SizedBox(height: 20),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.black,
@@ -244,22 +248,26 @@ class AgregarFigura extends StatefulWidget {
                     child: GestureDetector(
                       onTap: _pickImage,
                       child: Container(
-                        height: 400,
+                        height: 600,
                         width: 100,
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black, width: 1),
+                          border: Border.all(color: Colors.black, width: 0),
                         ),
                         child: _selectedImage != null
                             ? FutureBuilder<String>(
                           future: _getImageUrl(_selectedImage!),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                              return Image.network(snapshot.data!, fit: BoxFit.cover);
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Error al cargar la imagen'));
-                            } else {
-                              return Center(child: CircularProgressIndicator());
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              if (snapshot.hasData) {
+                                return Image.network(
+                                  snapshot.data!,
+                                  fit: BoxFit.cover,
+                                );
+                              } else if (snapshot.hasError) {
+                                return Center(child: Text('Error al cargar la imagen.'));
+                              }
                             }
+                            return Center(child: CircularProgressIndicator());
                           },
                         )
                             : Center(
@@ -281,24 +289,14 @@ class AgregarFigura extends StatefulWidget {
     );
   }
 
+  // Método para construir los campos de texto
   Widget _buildTextField(String label, TextEditingController controller) {
-    return Row(
-      children: [
-        Text(
-          '$label:',
-          style: TextStyle(fontSize: 16),
-        ),
-        SizedBox(width: 10),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-            ),
-          ),
-        ),
-      ],
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(),
+      ),
     );
   }
 }

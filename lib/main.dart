@@ -2,9 +2,7 @@ import 'dart:html'; // Necesario para el iframe
 import 'package:flutter/material.dart';
 import 'dart:ui_web';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:monstergeek/AdminMenu.dart';
-import 'package:monstergeek/AutosEscala/AdministrarAuto.dart';
-import 'package:monstergeek/AutosEscala/AgregarAuto.dart';
+import 'package:monstergeek/AutosEscala/VentaAutos.dart';
 import 'package:monstergeek/IniciarSesion.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -102,7 +100,17 @@ class _HomePageState extends State<HomePage> {
 
   Widget _navLink(String text) {
     return TextButton(
-      onPressed: () {},
+      onPressed: () {
+        if (text == 'Autos a Escala') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventaautos()),
+          );
+        } else {
+          // Aquí puedes agregar la lógica de navegación para otras opciones
+          print("Selected: $text");
+        }
+      },
       child: Text(text, style: TextStyle(color: Colors.white)),
     );
   }
@@ -229,15 +237,26 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildCategoryItem(String imagePath, String title) {
-    return Column(
-      children: [
-        SizedBox(height: 30),
-        Image.asset(imagePath, height: 250, width: 250),
-        Text(title, style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
-        SizedBox(height: 50),
-      ],
+    return GestureDetector(
+      onTap: () {
+        if (title == 'Autos a Escala') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventaautos()),
+          );
+        }
+      },
+      child: Column(
+        children: [
+          SizedBox(height: 30),
+          Image.asset(imagePath, height: 250, width: 250),
+          Text(title, style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
+          SizedBox(height: 50),
+        ],
+      ),
     );
   }
+
 
   Widget _buildServicesSection() {
     return Column(

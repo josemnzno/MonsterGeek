@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:html' as html; // Importa dart:html para la web
 import 'dart:async'; // Importa para usar Completer
+import 'package:flutter/foundation.dart'; // Importa kIsWeb para detectar plataforma web
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,16 +29,20 @@ class Agregarcomics extends StatelessWidget {
 class AgregarComics extends StatefulWidget {
   @override
   _AgregarComicsState createState() => _AgregarComicsState();
-}class _AgregarComicsState extends State<AgregarComics> {
+}
+
+class _AgregarComicsState extends State<AgregarComics> {
   html.File? _selectedImage; // Variable para almacenar la imagen seleccionada
+  String? _imageUrl; // URL de la imagen para la web
 
   // Controladores de texto
   final TextEditingController _marcaController = TextEditingController();
   final TextEditingController _serieController = TextEditingController();
   final TextEditingController _piezasController = TextEditingController(text: '1');
   final TextEditingController _modeloController = TextEditingController();
-  final TextEditingController _descripcionController = TextEditingController(text: 'Comic');
+  final TextEditingController _descripcionController = TextEditingController(text: 'comic');
   final TextEditingController _precioController = TextEditingController();
+  final TextEditingController _escalaController = TextEditingController(text: '1:64');
 
   // Variable para manejar la selección de la marca
   String _marcaSeleccionada = 'Marvel'; // Valor por defecto
@@ -117,6 +122,7 @@ class AgregarComics extends StatefulWidget {
         'modelo': _modeloController.text,
         'descripcion': _descripcionController.text,
         'precio': double.tryParse(_precioController.text) ?? 0.0,
+        'escala': _escalaController.text,
         'imagenUrl': imagenUrl,
       });
 
@@ -168,7 +174,7 @@ class AgregarComics extends StatefulWidget {
             padding: EdgeInsets.all(10),
             child: Container(
               color: Colors.lightBlueAccent,
-              padding: EdgeInsets.all(100),
+              padding: EdgeInsets.all(20),
               width: 1000,  // Aquí ajustas el ancho del cuadro
               height: 800, // Aquí ajustas la altura del cuadro
               child: Row(
@@ -180,7 +186,7 @@ class AgregarComics extends StatefulWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Agregar Comic',
+                          'Agregar Comics',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -217,12 +223,12 @@ class AgregarComics extends StatefulWidget {
                         SizedBox(height: 10),
                         _buildTextField('Precio', _precioController),
                         SizedBox(height: 10),
-                        _buildTextField('Año', _modeloController),
+                        _buildTextField('Modelo', _modeloController),
                         SizedBox(height: 10),
                         _buildTextField('Tipo', _descripcionController),
                         SizedBox(height: 10),
                         _buildTextField('Piezas disponibles', _piezasController),
-                        SizedBox(height: 10),
+                        SizedBox(height: 20),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.black,
@@ -244,22 +250,26 @@ class AgregarComics extends StatefulWidget {
                     child: GestureDetector(
                       onTap: _pickImage,
                       child: Container(
-                        height: 400,
+                        height: 600,
                         width: 100,
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black, width: 1),
+                          border: Border.all(color: Colors.black, width: 0),
                         ),
                         child: _selectedImage != null
                             ? FutureBuilder<String>(
                           future: _getImageUrl(_selectedImage!),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                              return Image.network(snapshot.data!, fit: BoxFit.cover);
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Error al cargar la imagen'));
-                            } else {
-                              return Center(child: CircularProgressIndicator());
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              if (snapshot.hasData) {
+                                return Image.network(
+                                  snapshot.data!,
+                                  fit: BoxFit.cover,
+                                );
+                              } else if (snapshot.hasError) {
+                                return Center(child: Text('Error al cargar la imagen.'));
+                              }
                             }
+                            return Center(child: CircularProgressIndicator());
                           },
                         )
                             : Center(
@@ -281,24 +291,14 @@ class AgregarComics extends StatefulWidget {
     );
   }
 
+  // Método para construir los campos de texto
   Widget _buildTextField(String label, TextEditingController controller) {
-    return Row(
-      children: [
-        Text(
-          '$label:',
-          style: TextStyle(fontSize: 16),
-        ),
-        SizedBox(width: 10),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-            ),
-          ),
-        ),
-      ],
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(),
+      ),
     );
   }
 }

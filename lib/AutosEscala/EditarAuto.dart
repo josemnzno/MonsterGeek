@@ -142,9 +142,17 @@ class _EditarAutoState extends State<EditarAuto> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editar Artículos'),
+        title: Row(
+          children: [
+            Image.asset('lib/assets/logo.png', height: 40),
+            SizedBox(width: 10),
+            Text('Monster Geek', style: TextStyle(color: Colors.white)),
+          ],
+        ),
         backgroundColor: Colors.black,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(
+          color: Colors.white,  // Cambiar el color del icono (flecha de retroceso) a blanco
+        ),
       ),
       body: Column(
         children: [
