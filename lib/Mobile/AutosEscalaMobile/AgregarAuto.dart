@@ -10,10 +10,10 @@ import 'package:flutter/foundation.dart'; // Importa kIsWeb para detectar plataf
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(Agregarcomics());
+  runApp(Agregarauto());
 }
 
-class Agregarcomics extends StatelessWidget {
+class Agregarauto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,17 +21,17 @@ class Agregarcomics extends StatelessWidget {
       theme: ThemeData(
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      home: AgregarComics(),
+      home: AgregarAuto(),
     );
   }
 }
 
-class AgregarComics extends StatefulWidget {
+class AgregarAuto extends StatefulWidget {
   @override
-  _AgregarComicsState createState() => _AgregarComicsState();
+  _AgregarAutoState createState() => _AgregarAutoState();
 }
 
-class _AgregarComicsState extends State<AgregarComics> {
+class _AgregarAutoState extends State<AgregarAuto> {
   html.File? _selectedImage; // Variable para almacenar la imagen seleccionada
   String? _imageUrl; // URL de la imagen para la web
 
@@ -40,10 +40,12 @@ class _AgregarComicsState extends State<AgregarComics> {
   final TextEditingController _serieController = TextEditingController();
   final TextEditingController _piezasController = TextEditingController(text: '1');
   final TextEditingController _modeloController = TextEditingController();
-  final TextEditingController _descripcionController = TextEditingController(text: 'comic');
-  final TextEditingController _precioController = TextEditingController(text: '30');
+  final TextEditingController _descripcionController = TextEditingController(text: 'Vehiculo Hot Wheels');
+  final TextEditingController _precioController = TextEditingController();
+  final TextEditingController _escalaController = TextEditingController(text: '1:64');
+
   // Variable para manejar la selección de la marca
-  String _marcaSeleccionada = 'Marvel'; // Valor por defecto
+  String _marcaSeleccionada = 'Hot Wheels'; // Valor por defecto
 
   bool _isLoading = false; // Controla el estado de carga (si el botón está bloqueado)
 
@@ -90,7 +92,7 @@ class _AgregarComicsState extends State<AgregarComics> {
       // Obtén una referencia al almacenamiento de Firebase
       final storageRef = FirebaseStorage.instance
           .ref()
-          .child('imagenes_comics/${DateTime.now().toString()}');
+          .child('imagenes_autos/${DateTime.now().toString()}');
 
       // Sube el blob
       await storageRef.putBlob(blob);
@@ -113,13 +115,14 @@ class _AgregarComicsState extends State<AgregarComics> {
       String? imagenUrl = await _subirImagen();
 
       // Crear un documento en la colección "autos"
-      await FirebaseFirestore.instance.collection('comics').add({
+      await FirebaseFirestore.instance.collection('autos').add({
         'marca': _marcaSeleccionada == 'Otro' ? _marcaController.text : _marcaSeleccionada,
         'serie': _serieController.text,
         'piezas': int.tryParse(_piezasController.text) ?? 0,
         'modelo': _modeloController.text,
         'descripcion': _descripcionController.text,
         'precio': double.tryParse(_precioController.text) ?? 0.0,
+        'escala': _escalaController.text,
         'imagenUrl': imagenUrl,
       });
 
@@ -183,7 +186,7 @@ class _AgregarComicsState extends State<AgregarComics> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Agregar Comics',
+                          'Agregar Auto',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -202,7 +205,7 @@ class _AgregarComicsState extends State<AgregarComics> {
                                   _marcaSeleccionada = newValue!;
                                 });
                               },
-                              items: <String>['Marvel', 'DC', 'Otro']
+                              items: <String>['Hot Wheels', 'Matchbox', 'Otro']
                                   .map<DropdownMenuItem<String>>((String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
@@ -216,7 +219,7 @@ class _AgregarComicsState extends State<AgregarComics> {
                         if (_marcaSeleccionada == 'Otro')
                           _buildTextField('Escribe la marca', _marcaController),
                         SizedBox(height: 10),
-                        _buildTextField('Serie', _serieController),
+                        _buildTextField('Serie tarjeta', _serieController),
                         SizedBox(height: 10),
                         _buildTextField('Precio', _precioController),
                         SizedBox(height: 10),
@@ -225,6 +228,8 @@ class _AgregarComicsState extends State<AgregarComics> {
                         _buildTextField('Tipo', _descripcionController),
                         SizedBox(height: 10),
                         _buildTextField('Piezas disponibles', _piezasController),
+                        SizedBox(height: 10),
+                        _buildTextField('Escala', _escalaController),
                         SizedBox(height: 20),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(

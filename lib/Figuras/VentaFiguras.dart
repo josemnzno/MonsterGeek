@@ -16,10 +16,10 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(Ventaautos());
+  runApp(Ventafiguras());
 }
 
-class Ventaautos extends StatelessWidget {
+class Ventafiguras extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _cargarArticulos() async {
     try {
-      final snapshot = await FirebaseFirestore.instance.collection('autos').get();
+      final snapshot = await FirebaseFirestore.instance.collection('figuras').get();
       setState(() {
         _articulos = snapshot.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList();
         _articulosFiltrados = List.from(_articulos); // Inicialmente mostrar todos los artículos
@@ -223,10 +223,10 @@ class _HomePageState extends State<HomePage> {
   Widget _navLink(String text) {
     return TextButton(
       onPressed: () {
-        if (text == 'Autos a Escala') {
+        if (text == 'Figuras') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Ventaautos()),
+            MaterialPageRoute(builder: (context) => Ventafiguras()),
           );
         } else if(text=='Inicio') {
           Navigator.push(

@@ -47,6 +47,8 @@ dependencies:
   flutter_image_compress:
   path_provider:
   file_picker:
+  excel:
+
 
 
 
@@ -68,6 +70,8 @@ dev_dependencies:
   flutter_image_compress:
   path_provider:
   file_picker:
+  excel:
+
 
 
 

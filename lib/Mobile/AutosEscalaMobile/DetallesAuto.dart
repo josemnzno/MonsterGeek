@@ -9,6 +9,7 @@ import 'package:monstergeek/main.dart';
 import '../Comics/EditarComics.dart';
 import '../IniciarSesion.dart';
 import '../firebase_options.dart';
+import 'VentaAutos.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +17,9 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(Ventaautos());
 }
 
-class Ventaautos extends StatelessWidget {
+class Detallesauto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,7 +27,7 @@ class Ventaautos extends StatelessWidget {
       theme: ThemeData(
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      home: HomePage(),
+      home: Detallesauto(),
     );
   }
 }
@@ -38,7 +38,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController _buscarController = TextEditingController();
   List<Map<String, dynamic>> _articulos = [];
   List<Map<String, dynamic>> _articulosFiltrados = [];
   String _ordenSeleccionado = 'Por Defecto';
@@ -109,93 +108,6 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: _buildNavLinks(),
         backgroundColor: Colors.black,
-      ),
-      body: SingleChildScrollView( // Permite el desplazamiento de toda la página
-        child: Column(
-          children: [
-            // Filtro de búsqueda y orden
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _buscarController,
-                    decoration: InputDecoration(
-                      labelText: 'Buscar Artículo',
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: _filtrarArticulos,
-                  ),
-                  SizedBox(height: 10),
-                  // Dropdown para ordenar
-                  DropdownButton<String>(
-                    value: _ordenSeleccionado,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _ordenSeleccionado = newValue!;
-                        _ordenarArticulos(); // Ordena cada vez que se seleccione una opción
-                      });
-                    },
-                    items: <String>['Por Defecto', 'Precio Ascendente', 'Precio Descendente', 'Nombre A-Z', 'Nombre Z-A']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ),
-            _articulosFiltrados.isEmpty
-                ? Center(child: CircularProgressIndicator())
-                : LayoutBuilder(
-              builder: (context, constraints) {
-                // Calcula el número de columnas según el ancho de la pantalla
-                int crossAxisCount = constraints.maxWidth > 1200 ? 4 : 1;
-
-                return GridView.builder(
-                  shrinkWrap: true, // Hace que el GridView ocupe solo el espacio necesario
-                  physics: NeverScrollableScrollPhysics(), // Desactiva el desplazamiento dentro del GridView
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    mainAxisSpacing: 7,
-                    crossAxisSpacing: 7,
-                    childAspectRatio: constraints.maxWidth > 100 ? 1.2 : 1.5, // Ajuste de la relación de aspecto
-                  ),
-                  itemCount: _articulosFiltrados.length,
-                  itemBuilder: (context, index) {
-                    final articulo = _articulosFiltrados[index];
-                    return Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(1.2),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 3.8,),
-                            HtmlImageView(imageUrl: articulo['imagenUrl']),
-                            SizedBox(height: 2),
-                            Text(articulo['modelo'], style: TextStyle(fontWeight: FontWeight.bold)),
-                            SizedBox(height: 0),
-                            Text('\$${articulo['precio']}', style: TextStyle(color: Colors.grey[700])),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-
-            // Banner inferior y enlaces legales
-            SizedBox(height: 20),
-            _buildFooter(),
-          ],
-        ),
       ),
     );
   }

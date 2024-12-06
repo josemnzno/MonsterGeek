@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monstergeek/Comics/AgregarComicsLote.dart';
 import 'package:monstergeek/Comics/EditarComics.dart';
 import 'package:monstergeek/Comics/EliminarComics.dart';
 
@@ -89,6 +90,8 @@ class AdministrarComics extends StatelessWidget {
               _buildOptionButton2(context, 'Eliminar'),
               SizedBox(height: 30),
               _buildOptionButton3(context, 'Editar'),
+              SizedBox(height: 30),
+              _buildOptionButton4(context, 'Agregar sin detalles'),
             ],
           ),
         ),
@@ -170,6 +173,28 @@ class AdministrarComics extends StatelessWidget {
       ),
     );
   }
+  Widget _buildOptionButton4(BuildContext context, String text) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.yellow,
+        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+      ),
+      onPressed: () {
+        if (text == 'Agregar sin detalles') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AgregarComicsLote()),
+          );
+        }
+      },
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 16),
+      ),
+    );
+  }
+
 
   List<Widget> _buildNavLinks() {
     return [
