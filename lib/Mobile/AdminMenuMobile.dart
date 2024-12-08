@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:monstergeek/Comics/AdministrarComics.dart';
 import 'package:monstergeek/Figuras/AdministrarFiguras.dart';
+import 'package:monstergeek/Mobile/AutosEscalaMobile/AdministrarAutoMobile.dart';
 import 'package:monstergeek/Mobile/Mobile.dart';
 import '../AutosEscala/AdministrarAuto.dart';
 
@@ -63,7 +64,7 @@ class AdminMenuHome extends StatelessWidget {
         padding: EdgeInsets.all(10),
         children: [
           _buildAdminCard('Administrar Inventario', [
-            {'label': 'Autos a Escala', 'route': AdministrarAuto()},
+            {'label': 'Autos a Escala', 'route': AdministrarAutoMobileApp()},
             {'label': 'Figuras', 'route': AdministrarFigura()},
             {'label': 'Cómics', 'route': AdministrarComics()},
           ], context),

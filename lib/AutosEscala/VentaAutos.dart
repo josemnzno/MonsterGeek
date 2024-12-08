@@ -5,6 +5,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monstergeek/Comics/VentaComics.dart';
+import 'package:monstergeek/Figuras/VentaFiguras.dart';
 import 'package:monstergeek/main.dart';
 import '../Comics/EditarComics.dart';
 import '../IniciarSesion.dart';
@@ -234,8 +236,16 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(builder: (context) => Princial()),
           );
 
-          // Aquí puedes agregar la lógica de navegación para otras opciones
-          print("Selected: $text");
+        }else if (text == 'Figuras') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventafiguras()),
+          );
+        }else if (text == 'Cómics') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventacomics()),
+          );
         }
       },
       child: Text(text, style: TextStyle(color: Colors.white)),

@@ -1,12 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:monstergeek/Comics/AdministrarComics.dart';
 import 'package:monstergeek/Figuras/AdministrarFiguras.dart';
+import 'package:monstergeek/Ventas.dart';
 
 import 'package:monstergeek/main.dart';
-import 'AutosEscala/AdministrarAuto.dart'; // Página de administración de Autos a escala
+import 'package:monstergeek/reporteVentas.dart';
+import 'AutosEscala/AdministrarAuto.dart';
+import 'AutosEscala/VentaAutos.dart';
+import 'Comics/VentaComics.dart';
+import 'Figuras/VentaFiguras.dart'; // Página de administración de Autos a escala
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,7 +62,6 @@ class AdminMenu extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildHeroSection(),
             _buildAdminMenu(context),
           ],
         ),
@@ -64,21 +69,32 @@ class AdminMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildHeroSection() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 40),
-      color: Colors.black,
-      child: Center(
-        child: Image.asset('lib/assets/banner.png', fit: BoxFit.cover),
-      ),
-    );
-  }
+
 
   Widget _buildAdminMenu(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20),
       child: Column(
         children: [
+          // Botón "Generar Venta"
+          ElevatedButton(
+            onPressed: () {
+              // Acción al presionar el botón
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => GenerarVenta()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green, // Color del botón
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            child: Text(
+              'Generar Venta',
+              style: TextStyle(fontSize: 30, color: Colors.white),
+            ),
+          ),
+          SizedBox(height: 20), // Espacio entre el botón y el texto "Administrador"
           Text(
             'Administrador',
             style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
@@ -129,6 +145,7 @@ class AdminMenu extends StatelessWidget {
     );
   }
 
+
   Widget _buildAdminCard(String title, List<String> items, BuildContext context) {
     return Container(
       padding: EdgeInsets.all(15),
@@ -169,6 +186,13 @@ class AdminMenu extends StatelessWidget {
                       builder: (context) => AdministrarComics(),
                     ),
                   );
+                }else if (item == 'Ventas') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HistorialVentas(),
+                    ),
+                  );
                 }
               },
               child: Container(
@@ -187,15 +211,14 @@ class AdminMenu extends StatelessWidget {
       ),
     );
   }
-
   List<Widget> _buildNavLinks(BuildContext context) {
     return [
-      _navLink('Inicio'),
-      _navLink('Autos a Escala'),
-      _navLink('Figuras'),
-      _navLink('Cómics'),
-      _navLink('Cafetería'),
-      _navLink('Servicios'),
+      _navLink('Inicio', context),
+      _navLink('Autos a Escala', context),
+      _navLink('Figuras', context),
+      _navLink('Cómics', context),
+      _navLink('Cafetería', context),
+      _navLink('Servicios', context),
       PopupMenuButton<String>(
         icon: Image.asset('lib/assets/icono.png', height: 30),
         onSelected: (value) {
@@ -215,14 +238,37 @@ class AdminMenu extends StatelessWidget {
     ];
   }
 
-  Widget _navLink(String text) {
+  Widget _navLink(String text, BuildContext context) {
     return TextButton(
       onPressed: () {
-        // Implementar la lógica de navegación aquí
+        if (text == 'Autos a Escala') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventaautos()),
+          );
+        } else if (text == 'Inicio') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Princial()),
+          );
+        } else if (text == 'Figuras') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventafiguras()),
+          );
+        } else if (text == 'Cómics') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventacomics()),
+          );
+        }
       },
       child: Text(text, style: TextStyle(color: Colors.white)),
     );
   }
+
+
+
 
   Widget _footerLink(String text) {
     return TextButton(

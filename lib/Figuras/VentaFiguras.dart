@@ -6,7 +6,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:monstergeek/main.dart';
+import '../AutosEscala/VentaAutos.dart';
 import '../Comics/EditarComics.dart';
+import '../Comics/VentaComics.dart';
 import '../IniciarSesion.dart';
 import '../firebase_options.dart';
 
@@ -223,10 +225,10 @@ class _HomePageState extends State<HomePage> {
   Widget _navLink(String text) {
     return TextButton(
       onPressed: () {
-        if (text == 'Figuras') {
+        if (text == 'Autos a Escala') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Ventafiguras()),
+            MaterialPageRoute(builder: (context) => Ventaautos()),
           );
         } else if(text=='Inicio') {
           Navigator.push(
@@ -234,8 +236,16 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(builder: (context) => Princial()),
           );
 
-          // Aquí puedes agregar la lógica de navegación para otras opciones
-          print("Selected: $text");
+        }else if (text == 'Figuras') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventafiguras()),
+          );
+        }else if (text == 'Cómics') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventacomics()),
+          );
         }
       },
       child: Text(text, style: TextStyle(color: Colors.white)),

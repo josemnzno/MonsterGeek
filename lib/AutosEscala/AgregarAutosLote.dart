@@ -58,26 +58,26 @@ class _AgregarArticuloState extends State<AgregarArticulo> {
           for (var row in sheet.rows.skip(1)) {
             // Suponiendo que las columnas son:
             // Código, Precio Venta, Inventario
-            String? codigo = row[0]?.value?.toString();
+            String? serie = row[0]?.value?.toString();
 
             // Procesar Precio Venta para eliminar el símbolo "$"
             String? precioRaw = row[1]?.value?.toString();
-            double? precioVenta = precioRaw != null
+            double? precio = precioRaw != null
                 ? double.tryParse(precioRaw.replaceAll(RegExp(r'[^0-9.]'), ''))
                 : 0.0;
 
             // Procesar Inventario como entero
-            int? inventario = 0;
+            int? piezas = 0;
             if (row[2]?.value != null) {
-              inventario = int.tryParse(row[2]!.value.toString().split('.')[0]);
+              piezas = int.tryParse(row[2]!.value.toString().split('.')[0]);
             }
-            if (inventario == null) inventario = 0;
+            if (piezas == null) piezas = 0;
 
-            if (codigo != null) {
+            if (serie != null) {
               await _guardarArticuloEnFirebase(
-                codigo: codigo,
-                precioVenta: precioVenta ?? 0.0,
-                inventario: inventario,
+                serie: serie,
+                precio: precio ?? 0.0,
+                piezas: piezas,
               );
             }
           }
@@ -100,30 +100,30 @@ class _AgregarArticuloState extends State<AgregarArticulo> {
 
   // Función para guardar un artículo en Firebase
   Future<void> _guardarArticuloEnFirebase({
-    required String codigo,
-    required double precioVenta,
-    required int inventario,
+    required String serie,
+    required double precio,
+    required int piezas,
   }) async {
     try {
       // Verificar si ya existe un artículo con el mismo código
       QuerySnapshot query = await FirebaseFirestore.instance
           .collection('articulos')
-          .where('codigo', isEqualTo: codigo)
+          .where('serie', isEqualTo: serie)
           .get();
 
       if (query.docs.isNotEmpty) {
         // Si existe, actualizar el inventario
         DocumentSnapshot doc = query.docs.first;
         await doc.reference.update({
-          'inventario': (doc['inventario'] as int) + inventario,
-          'precioVenta': precioVenta, // Actualizar el precio si cambia
+          'piezas': (doc['piezas'] as int) + piezas,
+          'precio': precio, // Actualizar el precio si cambia
         });
       } else {
         // Si no existe, agregar un nuevo artículo
         await FirebaseFirestore.instance.collection('articulos').add({
-          'codigo': codigo,
-          'precioVenta': precioVenta,
-          'inventario': inventario,
+          'serie': serie,
+          'precio': precio,
+          'piezas': piezas,
         });
       }
     } catch (e) {

@@ -2,6 +2,7 @@ import 'dart:html'; // Necesario para el iframe
 import 'package:flutter/material.dart';
 import 'dart:ui_web';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:monstergeek/AdminMenu.dart';
 import 'package:monstergeek/AutosEscala/VentaAutos.dart';
 import 'package:monstergeek/Comics/VentaComics.dart';
 import 'package:monstergeek/Figuras/VentaFiguras.dart';
@@ -256,6 +257,16 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Ventaautos()),
+          );
+        }else if (title == 'Cómics') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventacomics()),
+          );
+        }else if (title == 'Figuras') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Ventafiguras()),
           );
         }
       },

@@ -48,6 +48,11 @@ dependencies:
   path_provider:
   file_picker:
   excel:
+  flutter_pdfview:
+  pdf:
+  intl:
+
+
 
 
 
@@ -71,6 +76,11 @@ dev_dependencies:
   path_provider:
   file_picker:
   excel:
+  flutter_pdfview:
+  pdf:
+  intl:
+
+
 
 
 
